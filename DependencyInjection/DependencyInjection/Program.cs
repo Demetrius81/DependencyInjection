@@ -1,56 +1,11 @@
 ﻿using DependencyInjection;
 
-//IContainerBuilder builder = new ContainerBuilder();
-//builder.RegisterScoped<IService, Service>()
-//       .RegisterTranscient<IHelper>(s => new Helper())
-//       .RegisterSingleton<IAnotherService>(AnotherService.Instance);
-
-IContainerBuilder builder = new ContainerBuilder();
-
-var container = builder
-    .RegisterTranscient<IService, Service>()
-    .RegisterScoped<Controller, Controller>()
-    .Build();
-
-var scope = container.CreateScope();
-
-var controller1 = scope.Resolve(typeof(Controller));
-var controller2 = scope.Resolve(typeof(Controller));
-
-if (controller1 != controller2)
-{
-    throw new InvalidOperationException();
-}
-Console.ReadKey(true);
 
 
 
 
-
-interface IAnotherService
-{
-    //Интерфейс сервиса - заглушка
-}
-
-class AnotherService : IAnotherService
-{
-    //Сервис - заглушка
-    private AnotherService()
-    {
-
-    }
-    public static AnotherService Instance = new();
-}
-
-interface IHelper
-{
-    //Интерфейс - заглушка
-}
-
-class Helper : IHelper
-{
-    //Класс - заглушка
-}
+Run run = new Run();
+run.RunTest();
 
 
 
@@ -61,38 +16,73 @@ class Helper : IHelper
 
 
 
-class Registration
-{
-    public IContainer ConfigureServices()
-    {
-        var builder = new ContainerBuilder();
-        builder.RegisterTranscient<IService, Service>();
-        builder.RegisterScoped<Controller, Controller>();
-        return builder.Build();
-    }
-}
 
-class Controller
-{
-    private readonly IService _service;
 
-    public Controller(IService service)
-    {
-        _service = service;
-    }
 
-    public void Do()
-    {
+//IContainerBuilder builder = new ContainerBuilder(new LambdaBasedActivationBuilder());
+//using (var container = builder
+//        .RegisterTranscient<IService, Service>()
+//        .RegisterScoped<Controller, Controller>()
+//        .RegisterSingleton<IAnotherService>(AnotherService.Instance)
+//        .Build())
+//{
 
-    }
-}
+//    var scope = container.CreateScope();
 
-interface IService
-{
+//    var controller1 = scope.Resolve(typeof(Controller));
+//    var controller2 = scope.Resolve(typeof(Controller));
+//    var i1 = scope.Resolve(typeof(IAnotherService));
 
-}
+//    var scope2 = container.CreateScope();
+//    var controller3 = scope2.Resolve(typeof(Controller));
+//    var i2 = scope2.Resolve(typeof(IAnotherService));
 
-class Service : IService
-{
+//    if (controller1 != controller2 
+//        || controller1 == controller3 
+//        || controller2 == controller3 
+//        || i1 != i2 
+//        || scope == scope2)
+//    {
+//        throw new InvalidOperationException();
+//    }
+//    Console.ReadKey(true);
+//}
 
-}
+//interface IAnotherService
+//{
+//    //Интерфейс сервиса - заглушка
+//}
+
+//class AnotherService : IAnotherService
+//{
+//    //Сервис - заглушка
+//    private AnotherService()
+//    {
+
+//    }
+//    public static AnotherService Instance = new();
+//}
+
+//interface IHelper
+//{
+//    //Интерфейс - заглушка
+//}
+
+//class Helper : IHelper
+//{
+//    //Класс - заглушка
+//}
+
+//class Registration
+//{
+//    public IContainer ConfigureServices()
+//    {
+//        var builder = new ContainerBuilder(new LambdaBasedActivationBuilder());
+//        builder.RegisterTranscient<IService, Service>();
+//        builder.RegisterScoped<Controller, Controller>();
+//        return builder.Build();
+//    }
+//}
+
+
+
