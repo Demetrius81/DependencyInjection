@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -38,10 +40,23 @@ namespace DependencyInjection
 
     public class Container : IContainer
     {
-        private readonly Dictionary<Type, ServiceDescriptor> _descriptors;
+        private readonly ImmutableDictionary<Type, ServiceDescriptor> _descriptors;
+
+        private readonly ConcurrentDictionary<Type, Func<IScope, object>> _buildActovators = new();
+
+        private readonly Scope _rootScope;
+
+        public Container(IEnumerable<ServiceDescriptor> descriptors)
+        {
+            _descriptors = descriptors.ToImmutableDictionary(x => x.ServiceType);
+            _rootScope = new(this);
+        }
+
         private class Scope : IScope
         {
             private readonly Container _container;
+
+            private readonly ConcurrentDictionary<Type, object> _scopedInstances = new();
 
             public Scope(Container container)
             {
@@ -49,13 +64,31 @@ namespace DependencyInjection
             }
             public object Resolve(Type service)
             {
-                // Временная реализация
+                var descriptor = _container.FindDescriptor(service);
+                if (descriptor.Lifetime == LifeTime.Transient)
+                {
+                    return _container.CreateInstance(service, this);
+                }
 
-                return _container.CreateInstance(service, this);
+                if (descriptor.Lifetime == LifeTime.Scoped || _container._rootScope == this)
+                {
+                    return _scopedInstances.GetOrAdd(service, s => _container.CreateInstance(s, this));
+                }
+                else
+                {
+                    return _container._rootScope.Resolve(service);
+                }
             }
         }
 
-        private object CreateInstance(Type service, IScope scope)
+        private ServiceDescriptor? FindDescriptor(Type service)
+        {
+            _descriptors.TryGetValue(service, out var descriptor);
+
+            return descriptor;
+        }
+
+        private Func<IScope, object> BuildActivation(Type service)
         {
             if (!_descriptors.TryGetValue(service, out var descriptor))
             {
@@ -64,31 +97,34 @@ namespace DependencyInjection
 
             if (descriptor is InstanceBasedServiceDescriptor ib)
             {
-                return ib.Instance;
+                return _ => ib.Instance;
             }
             if (descriptor is FactoryBasedServiceDescriptor fb)
             {
-                return fb.Factory(scope);
+                return fb.Factory;
             }
 
             var tb = (TypeBasedServiceDescriptor)descriptor;
-
             var ctor = tb.ImplementationType.GetConstructors(BindingFlags.Public | BindingFlags.Instance).Single();
             var args = ctor.GetParameters();
-            var argsForCtor = new object[args.Length];
-
-            for (int i = 0; i < args.Length; i++)
+            return s =>
             {
-                argsForCtor[i] = CreateInstance(args[i].ParameterType, scope);
-            }
+                var argsForCtor = new object[args.Length];
 
-            return ctor.Invoke(argsForCtor);
+                for (int i = 0; i < args.Length; i++)
+                {
+                    argsForCtor[i] = CreateInstance(args[i].ParameterType, s);
+                }
+
+                return ctor.Invoke(argsForCtor);
+            };
         }
 
-        public Container(IEnumerable<ServiceDescriptor> descriptors)
+        private object CreateInstance(Type service, IScope scope)
         {
-            _descriptors = descriptors.ToDictionary(x => x.ServiceType);
+            return _buildActovators.GetOrAdd(service, service => BuildActivation(service))(scope);
         }
+
         public IScope CreateScope()
         {
             return new Scope(this);
@@ -104,28 +140,4 @@ namespace DependencyInjection
     {
         object Resolve(Type service);
     }
-
-
-
-
-
-    //var reg = new Registration();
-    //var conteiner = reg.ConfigureServices();
-    //conteiner.Resolve<Controller>().Do();
-
-
-
-
-
-    //class ContainerBuilder : IContainerBuilder
-    //{
-
-    //}
-
-
-    //class Container : IContainer
-    //{
-
-    //}
-
 }

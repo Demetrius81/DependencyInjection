@@ -13,7 +13,14 @@ var container = builder
     .Build();
 
 var scope = container.CreateScope();
-var service = scope.Resolve(typeof(Controller));
+
+var controller1 = scope.Resolve(typeof(Controller));
+var controller2 = scope.Resolve(typeof(Controller));
+
+if (controller1 != controller2)
+{
+    throw new InvalidOperationException();
+}
 Console.ReadKey(true);
 
 
@@ -22,12 +29,12 @@ Console.ReadKey(true);
 
 interface IAnotherService
 {
-    //Интерфейс - заглушка
+    //Интерфейс сервиса - заглушка
 }
 
 class AnotherService : IAnotherService
 {
-    //Класс - заглушка
+    //Сервис - заглушка
     private AnotherService()
     {
 
