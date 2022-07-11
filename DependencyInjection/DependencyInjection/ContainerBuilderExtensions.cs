@@ -6,33 +6,6 @@ using System.Threading.Tasks;
 
 namespace DependencyInjection
 {
-    public enum LifeTime
-    {
-        Transient,
-        Scoped,
-        Singleton
-    }
-
-
-
-
-
-    public interface IContainerBuilder
-    {
-        void Register(ServiceDescriptor descriptor);
-        IContainer Build();
-    }
-
-    public interface IContainer
-    {
-        IScope CreateScope();
-    }
-
-    public interface IScope
-    {
-        object Resolve(Type service);
-    }
-
     public static class ContainerBuilderExtensions
     {
         private static IContainerBuilder RedisterType(this IContainerBuilder builder, Type service, Type implimintation, LifeTime lifeTime)
@@ -59,7 +32,7 @@ namespace DependencyInjection
 
         private static IContainerBuilder RedisterInstance(this IContainerBuilder builder, Type service, object instance)
         {
-            builder.Register(new InstanceBasedServiceDescriptor(service, instance));            
+            builder.Register(new InstanceBasedServiceDescriptor(service, instance));
             return builder;
         }
 
@@ -98,26 +71,4 @@ namespace DependencyInjection
         public static IContainerBuilder RegisterSingleton<TService>(this IContainerBuilder builder, object instance)
         => builder.RedisterInstance(typeof(TService), instance);
     }
-
-
-
-    //var reg = new Registration();
-    //var conteiner = reg.ConfigureServices();
-    //conteiner.Resolve<Controller>().Do();
-
-
-
-
-
-    //class ContainerBuilder : IContainerBuilder
-    //{
-
-    //}
-
-
-    //class Container : IContainer
-    //{
-
-    //}
-
 }
