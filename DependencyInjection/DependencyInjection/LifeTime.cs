@@ -1,10 +1,8 @@
-﻿
-namespace DependencyInjection
+﻿namespace DependencyInjection;
+
+public enum LifeTime
 {
-    public enum LifeTime
-    {
-        Transient,
-        Scoped,
-        Singleton
-    }
+    Transient,
+    Scoped,
+    Singleton
 }
