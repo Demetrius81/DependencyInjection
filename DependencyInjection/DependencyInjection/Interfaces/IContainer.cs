@@ -1,8 +1,5 @@
-﻿
-namespace DependencyInjection
+﻿namespace DependencyInjection;
+public interface IContainer : IDisposable, IAsyncDisposable
 {
-    public interface IContainer : IDisposable, IAsyncDisposable
-    {
-        IScope CreateScope();
-    }
+    IScope CreateScope();
 }

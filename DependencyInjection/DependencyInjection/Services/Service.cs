@@ -1,8 +1,5 @@
-﻿
-namespace DependencyInjection
+﻿namespace DependencyInjection;
+public class Service : IService  // Сервис - пустышка
 {
-    public class Service : IService  // Сервис - пустышка
-    {
 
-    }
 }

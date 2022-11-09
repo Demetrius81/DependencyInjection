@@ -1,8 +1,6 @@
-﻿
-namespace DependencyInjection
+﻿namespace DependencyInjection;
+
+public interface IActivationBuilder
 {
-    public interface IActivationBuilder
-    {
-        Func<IScope, object> BuildActivation(ServiceDescriptor descriptor);
-    }
+    Func<IScope, object> BuildActivation(ServiceDescriptor descriptor);
 }

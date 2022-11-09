@@ -1,9 +1,7 @@
-﻿
-namespace DependencyInjection
+﻿namespace DependencyInjection;
+
+public interface IContainerBuilder
 {
-    public interface IContainerBuilder
-    {
-        void Register(ServiceDescriptor descriptor);
-        IContainer Build();
-    }
+    void Register(ServiceDescriptor descriptor);
+    IContainer Build();
 }

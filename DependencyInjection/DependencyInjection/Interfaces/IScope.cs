@@ -1,8 +1,6 @@
-﻿
-namespace DependencyInjection
+﻿namespace DependencyInjection;
+
+public interface IScope : IDisposable, IAsyncDisposable
 {
-    public interface IScope : IDisposable, IAsyncDisposable
-    {
-        object Resolve(Type service);
-    }
+    object Resolve(Type service);
 }

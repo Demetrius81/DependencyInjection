@@ -1,7 +1,5 @@
-﻿namespace DependencyInjection
+﻿namespace DependencyInjection;
+public interface IService
 {
-    public interface IService
-    {
 
-    }
 }
